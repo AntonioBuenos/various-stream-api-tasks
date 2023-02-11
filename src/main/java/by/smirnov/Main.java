@@ -34,7 +34,7 @@ public class Main {
     private static void task1() throws IOException {
         List<Animal> animals = Util.getAnimals();
         animals.stream()
-                .filter(a -> a.getAge() > 10 && a.getAge() < 20)
+                .filter(a -> a.getAge() >= 10 && a.getAge() <= 20)
                 .sorted(Comparator.comparingInt(Animal::getAge))
                 .skip(14)
                 .limit(7)
@@ -68,7 +68,9 @@ public class Main {
 
     private static void task5() throws IOException {
         List<Animal> animals = Util.getAnimals();
-        //        animals.stream() Продолжить ...
+        System.out.println(animals.stream()
+                .filter(a -> a.getAge() >= 20 && a.getAge() <= 30)
+                .anyMatch(a -> a.getOrigin().equals("Hungarian")));
     }
 
     private static void task6() throws IOException {
