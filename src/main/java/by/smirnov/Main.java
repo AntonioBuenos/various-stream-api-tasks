@@ -8,7 +8,9 @@ import by.smirnov.model.Person;
 import by.smirnov.util.Util;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -31,7 +33,12 @@ public class Main {
 
     private static void task1() throws IOException {
         List<Animal> animals = Util.getAnimals();
-        //        animals.stream() Продолжить ...
+        animals.stream()
+                .filter(a -> a.getAge() > 10 && a.getAge() < 20)
+                .sorted(Comparator.comparingInt(Animal::getAge))
+                .skip(14)
+                .limit(7)
+                .forEachOrdered(System.out::println);
     }
 
     private static void task2() throws IOException {
