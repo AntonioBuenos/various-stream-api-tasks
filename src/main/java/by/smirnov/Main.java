@@ -38,13 +38,15 @@ public class Main {
                 .sorted(Comparator.comparingInt(Animal::getAge))
                 .skip(14)
                 .limit(7)
-                .forEachOrdered(System.out::println);
+                .forEach(System.out::println);
     }
 
     private static void task2() throws IOException {
         List<Animal> animals = Util.getAnimals();
-        //        animals.stream() Продолжить ...
-
+        animals.stream()
+                .filter(a -> a.getOrigin().equals("Japanese") && a.getGender().equals("Female"))
+                .map(Animal::getBread)
+                .forEach(a -> System.out.println(a.toUpperCase()));
     }
 
     private static void task3() throws IOException {
