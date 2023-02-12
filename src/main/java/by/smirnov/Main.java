@@ -8,6 +8,7 @@ import by.smirnov.model.Person;
 import by.smirnov.util.Util;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -96,7 +97,12 @@ public class Main {
 
     private static void task9() throws IOException {
         List<Animal> animals = Util.getAnimals();
-        //        animals.stream() Продолжить ...
+        System.out.println(animals.stream()
+                .map(Animal::getBread)
+                .map(String::toCharArray)
+                .map(a -> a.length)
+                .min(Integer::compareTo)
+                .orElse(-1));
     }
 
     private static void task10() throws IOException {
