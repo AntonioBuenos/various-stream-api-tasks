@@ -8,6 +8,7 @@ import by.smirnov.model.Person;
 import by.smirnov.util.Util;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
@@ -128,8 +129,8 @@ public class Main {
         List<Person> people = Util.getPersons();
         people.stream()
                 .filter(person -> person.getGender().equals("Male")
-                        && ChronoUnit.YEARS.between(person.getDateOfBirth(), LocalDateTime.now()) >= 18
-                        && ChronoUnit.YEARS.between(person.getDateOfBirth(), LocalDateTime.now()) <= 27)
+                        && ChronoUnit.YEARS.between(person.getDateOfBirth(), LocalDate.now()) >= 18
+                        && ChronoUnit.YEARS.between(person.getDateOfBirth(), LocalDate.now()) <= 27)
                 .sorted(Comparator.comparingInt(Person::getRecruitmentGroup))
                 .limit(200)
                 .forEachOrdered(System.out::println);
