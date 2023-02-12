@@ -110,12 +110,16 @@ public class Main {
         System.out.println(animals.stream()
                 .map(Animal::getAge)
                 .reduce(Integer::sum)
-                .orElse(0));
+                .orElse(-1));
     }
 
     private static void task11() throws IOException {
         List<Animal> animals = Util.getAnimals();
-        //        animals.stream() Продолжить ...
+        System.out.println(animals.stream()
+                .filter(a -> a.getOrigin().equals("Indonesian"))
+                .mapToInt(Animal::getAge)
+                .average()
+                .orElse(-1));
     }
 
     private static void task12() throws IOException {
