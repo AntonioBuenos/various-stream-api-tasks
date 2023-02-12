@@ -107,7 +107,10 @@ public class Main {
 
     private static void task10() throws IOException {
         List<Animal> animals = Util.getAnimals();
-        //        animals.stream() Продолжить ...
+        System.out.println(animals.stream()
+                .map(Animal::getAge)
+                .reduce(Integer::sum)
+                .orElse(0));
     }
 
     private static void task11() throws IOException {
