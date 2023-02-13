@@ -12,6 +12,8 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -138,8 +140,8 @@ public class Main {
         List<Person> people = Util.getPersons();
         people.stream()
                 .filter(person -> person.getGender().equals("Male")
-                        && ChronoUnit.YEARS.between(person.getDateOfBirth(), LocalDate.now()) >= 18
-                        && ChronoUnit.YEARS.between(person.getDateOfBirth(), LocalDate.now()) <= 27)
+                        && age(person) >= 18
+                        && age(person) < 27)
                 .sorted(Comparator.comparingInt(Person::getRecruitmentGroup))
                 .limit(200)
                 .forEachOrdered(System.out::println);
@@ -147,7 +149,24 @@ public class Main {
 
     private static void task13() throws IOException {
         List<House> houses = Util.getHouses();
-        //        Продолжить...
+        Stream<Person> hospitalized = houses.stream()
+                .filter(h -> h.getBuildingType().equals("Hospital"))
+                .flatMap(h -> h.getPersonList().stream());
+        Stream<Person> kidsAndretired = houses.stream()
+                .filter(h -> !h.getBuildingType().equals("Hospital"))
+                .flatMap(h -> h.getPersonList().stream())
+                .filter(person -> age(person) < 18
+                || age(person)  >= 63
+                || (person.getGender().equals("Female")
+                        && age(person)  >= 58));
+
+        Stream.concat(
+                Stream.concat(hospitalized, kidsAndretired),
+                        houses.stream()
+                                .flatMap(h -> h.getPersonList().stream())
+                )
+                .distinct()
+                .forEachOrdered(System.out::println);
     }
 
     private static void task14() throws IOException {
@@ -158,5 +177,10 @@ public class Main {
     private static void task15() throws IOException {
         List<Flower> flowers = Util.getFlowers();
         //        Продолжить...
+    }
+
+    private static long age(Person person){
+        LocalDate birthday = person.getDateOfBirth();
+        return ChronoUnit.YEARS.between(birthday, LocalDate.now());
     }
 }
