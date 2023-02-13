@@ -9,12 +9,9 @@ import by.smirnov.util.Util;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -79,7 +76,19 @@ public class Main {
 
     private static void task6() throws IOException {
         List<Animal> animals = Util.getAnimals();
-        //        animals.stream() Продолжить ...
+        List<String> maleAnimals = animals.stream()
+                .filter(a -> a.getGender().equals("Male"))
+                .map(Animal::getBread)
+                .distinct()
+                .sorted()
+                .toList();
+        List<String> femaleAnimals = animals.stream()
+                .filter(a -> a.getGender().equals("Female"))
+                .map(Animal::getBread)
+                .distinct()
+                .sorted()
+                .toList();
+        System.out.println(maleAnimals.equals(femaleAnimals));
     }
 
     private static void task7() throws IOException {
