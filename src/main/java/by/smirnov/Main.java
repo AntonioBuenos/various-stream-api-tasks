@@ -166,6 +166,7 @@ public class Main {
                                 .flatMap(h -> h.getPersonList().stream())
                 )
                 .distinct()
+                .limit(500)
                 .forEachOrdered(System.out::println);
     }
 
