@@ -10,10 +10,20 @@ import by.smirnov.util.Util;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
+import java.util.function.ToIntFunction;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.mapping;
+import static java.util.stream.Collectors.toList;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -156,12 +166,12 @@ public class Main {
                 .filter(h -> !h.getBuildingType().equals("Hospital"))
                 .flatMap(h -> h.getPersonList().stream())
                 .filter(person -> age(person) < 18
-                || age(person)  >= 63
-                || (person.getGender().equals("Female")
-                        && age(person)  >= 58));
+                        || age(person) >= 63
+                        || (person.getGender().equals("Female")
+                        && age(person) >= 58));
 
         Stream.concat(
-                Stream.concat(hospitalized, kidsAndretired),
+                        Stream.concat(hospitalized, kidsAndretired),
                         houses.stream()
                                 .flatMap(h -> h.getPersonList().stream())
                 )
@@ -172,7 +182,20 @@ public class Main {
 
     private static void task14() throws IOException {
         List<Car> cars = Util.getCars();
-        //        Продолжить...
+        Double result = cars.stream().map(c -> Map.entry(getDirection(c), c))
+                .collect(groupingBy(Map.Entry::getKey, mapping(Map.Entry::getValue, toList())))
+                .entrySet().stream()
+                .map(e -> Map.entry(
+                        e.getKey(),
+                        e.getValue().stream()
+                                .map(car -> Double.valueOf(car.getMass())).reduce(Double::sum).orElse(0.0)))
+                .filter(entry -> !entry.getKey().equals("other"))
+                .map(entry -> Map.entry(entry.getKey(), Math.round(entry.getValue() / 1000 * 7.14 * 100) / 100.0))
+                .peek(System.out::println)
+                .mapToDouble(Map.Entry::getValue)
+                .reduce(Double::sum)
+                .orElse(0);
+        System.out.println(result);
     }
 
     private static void task15() throws IOException {
@@ -180,8 +203,35 @@ public class Main {
         //        Продолжить...
     }
 
-    private static long age(Person person){
+    private static long age(Person person) {
         LocalDate birthday = person.getDateOfBirth();
         return ChronoUnit.YEARS.between(birthday, LocalDate.now());
     }
+
+    private static String getDirection(Car c) {
+        if (c.getCarMake().equals("Jaguar")
+                || c.getColor().equals("White"))
+            return "Turkmenistan";
+        else if (c.getMass() < 1500
+                || c.getCarMake().equals("BMW")
+                || c.getCarMake().equals("Lexus")
+                || c.getCarMake().equals("Chrysler")
+                || c.getCarMake().equals("Toyota")) return "Uzbekistan";
+        else if (c.getCarMake().equals("GMC")
+                || c.getCarMake().equals("Dodge")
+                || (c.getColor().equals("Black") && c.getMass() > 4000)) return "Kazakhstan";
+        else if (c.getReleaseYear() < 1982
+                || c.getCarModel().equals("Civic")
+                || c.getCarModel().equals("Cherokee")) return "Kyrgyzstan";
+        else if (c.getPrice() > 40000
+                || (
+                !c.getColor().equals("Yellow")
+                        && !c.getColor().equals("Red")
+                        && !c.getColor().equals("Green")
+                        && !c.getColor().equals("Blue")
+        )) return "Russia";
+        else if (c.getVin().contains("59")) return "Mongolia";
+        else return "other";
+    }
 }
+
