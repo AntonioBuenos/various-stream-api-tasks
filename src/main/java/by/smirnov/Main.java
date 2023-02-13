@@ -8,6 +8,7 @@ import by.smirnov.model.Person;
 import by.smirnov.util.Util;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -200,7 +201,37 @@ public class Main {
 
     private static void task15() throws IOException {
         List<Flower> flowers = Util.getFlowers();
-        //        Продолжить...
+        List<Flower> catalog = flowers.stream()
+                .sorted(
+                        Comparator
+                                .comparing(Flower::getOrigin, Comparator.reverseOrder())
+                                .thenComparingInt(Flower::getPrice)
+                                .thenComparing(Flower::getWaterConsumptionPerDay, Comparator.reverseOrder())
+                )
+                .toList();
+
+        Double result = catalog.stream()
+                .sorted(
+                        Comparator.comparing(Flower::getCommonName).reversed()
+                )
+                .filter(flower -> flower.getCommonName().matches("^[C-S][a-zA-Z\\s]+"))
+                .filter(Flower::isShadePreferred)
+                .filter(flower -> flower.getFlowerVaseMaterial().contains("Aluminum")
+                        || flower.getFlowerVaseMaterial().contains("Glass")
+                        || flower.getFlowerVaseMaterial().contains("Steel"))
+                .mapToDouble(flower ->
+                        flower.getPrice() + (
+                                flower.getWaterConsumptionPerDay()
+                                        * getNumberOfDays(5)
+                                        * 1.39 / 1000
+                        ))
+                .reduce(Double::sum)
+                .orElse(0.0);
+        System.out.printf("%.2f $", result);
+    }
+
+    private static long getNumberOfDays(long years) {
+        return ChronoUnit.DAYS.between(LocalDate.now(), LocalDate.now().plusYears(years));
     }
 
     private static long age(Person person) {
