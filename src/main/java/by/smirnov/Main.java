@@ -8,18 +8,11 @@ import by.smirnov.model.Person;
 import by.smirnov.util.Util;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.function.ToIntFunction;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.groupingBy;
@@ -43,6 +36,7 @@ public class Main {
         task13();
         task14();
         task15();
+        task16();
     }
 
     private static void task1() throws IOException {
@@ -227,7 +221,77 @@ public class Main {
                         ))
                 .reduce(Double::sum)
                 .orElse(0.0);
-        System.out.printf("%.2f $", result);
+        System.out.printf("%.2f $%n", result);
+    }
+
+    private static void task16() throws IOException {
+        List<Person> people = Util.getPersons();
+        List<Flower> flowers = Util.getFlowers();
+        Double result = people.stream()
+                .collect(groupingBy(client -> {
+                    String key = null;
+                    if (client.getGender().equals("Male") && age(client) < 18) key = "youngMen";
+                    else if (client.getGender().equals("Male") && age(client) >= 30 && age(client) < 51)
+                        key = "businessMen";
+                    else if (client.getGender().equals("Female") || age(client) > 65) key = "flowerLovers";
+                    else key = "other";
+                    return key;
+                }, toList()))
+                .entrySet().stream()
+                .filter(entry -> !entry.getKey().equals("other"))
+                .map(e -> Map.entry(
+                        e.getKey(),
+                        e.getValue().stream()
+                                .sorted(Comparator
+                                        .comparing(Person::getLastName, Comparator.reverseOrder())
+                                        .thenComparing(Person::getFirstName)
+                                )
+                                .limit(10)
+                                .collect(toList())))
+                .map(entry -> {
+                    if (entry.getKey().equals("youngMen"))
+                        return Map.entry(
+                                entry.getKey(),
+                                entry.getValue().stream()
+                                        .map(person ->
+                                                Map.entry(
+                                                        person,
+                                                        flowers.stream()
+                                                                .filter(f -> f.getPrice() < 40 && f.getWaterConsumptionPerDay() < 0.8)
+                                                                .min(Comparator.comparing(Flower::getWaterConsumptionPerDay).thenComparing(Flower::getPrice))
+                                                                .orElse(new Flower())))
+                                        .toList());
+                    else if (entry.getKey().equals("businessMen"))
+                        return Map.entry(
+                                entry.getKey(),
+                                entry.getValue().stream()
+                                        .map(person ->
+                                                Map.entry(
+                                                        person,
+                                                        flowers.stream()
+                                                                .filter(f -> f.getPrice() > 500 && f.getWaterConsumptionPerDay() < 0.5)
+                                                                .min(Comparator.comparing(Flower::getPrice, Comparator.reverseOrder()).thenComparing(Flower::getWaterConsumptionPerDay))
+                                                                .orElse(new Flower())))
+                                        .toList());
+                    else return Map.entry(
+                                entry.getKey(),
+                                entry.getValue().stream()
+                                        .map(person ->
+                                                Map.entry(
+                                                        person,
+                                                        flowers.stream()
+                                                                .filter(f -> f.getPrice() < 300 && f.getPrice() >= 40 && f.getWaterConsumptionPerDay() > 1)
+                                                                .max(Comparator.comparing(Flower::getWaterConsumptionPerDay))
+                                                                .orElse(new Flower())))
+                                        .toList());
+                })
+                .peek(entry -> System.out.printf("%s = %s%n", entry.getKey(), entry.getValue()))
+                .map(entry -> entry.getValue().stream().mapToInt(e -> e.getValue().getPrice()).reduce(Integer::sum).orElse(0))
+                .mapToDouble(Double::valueOf)
+                .map(e -> e * 0.1 * 0.15)
+                .reduce(Double::sum)
+                .orElse(0);
+        System.out.printf("%.2f $%n", result);
     }
 
     private static long getNumberOfDays(long years) {
