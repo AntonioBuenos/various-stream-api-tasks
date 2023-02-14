@@ -247,44 +247,35 @@ public class Main {
                                         .thenComparing(Person::getFirstName)
                                 )
                                 .limit(10)
-                                .collect(toList())))
-                .map(entry -> {
-                    if (entry.getKey().equals("youngMen"))
-                        return Map.entry(
-                                entry.getKey(),
-                                entry.getValue().stream()
-                                        .map(person ->
-                                                Map.entry(
-                                                        person,
-                                                        flowers.stream()
-                                                                .filter(f -> f.getPrice() < 40 && f.getWaterConsumptionPerDay() < 0.8)
-                                                                .min(Comparator.comparing(Flower::getWaterConsumptionPerDay).thenComparing(Flower::getPrice))
-                                                                .orElse(new Flower())))
-                                        .toList());
-                    else if (entry.getKey().equals("businessMen"))
-                        return Map.entry(
-                                entry.getKey(),
-                                entry.getValue().stream()
-                                        .map(person ->
-                                                Map.entry(
-                                                        person,
-                                                        flowers.stream()
-                                                                .filter(f -> f.getPrice() > 500 && f.getWaterConsumptionPerDay() < 0.5)
-                                                                .min(Comparator.comparing(Flower::getPrice, Comparator.reverseOrder()).thenComparing(Flower::getWaterConsumptionPerDay))
-                                                                .orElse(new Flower())))
-                                        .toList());
-                    else return Map.entry(
-                                entry.getKey(),
-                                entry.getValue().stream()
-                                        .map(person ->
+                                .toList()))
+                .map(entry -> Map.entry(
+                        entry.getKey(),
+                        entry.getValue().stream()
+                                .map(person -> {
+                                    if (entry.getKey().equals("youngMen"))
+                                        return Map.entry(
+                                                person,
+                                                flowers.stream()
+                                                        .filter(f -> f.getPrice() < 40 && f.getWaterConsumptionPerDay() < 0.8)
+                                                        .min(Comparator.comparing(Flower::getWaterConsumptionPerDay).thenComparing(Flower::getPrice))
+                                                        .orElse(new Flower()));
+
+                                    else if (entry.getKey().equals("businessMen"))
+                                        return Map.entry(
+                                                person,
+                                                flowers.stream()
+                                                        .filter(f -> f.getPrice() > 500 && f.getWaterConsumptionPerDay() < 0.5)
+                                                        .min(Comparator.comparing(Flower::getPrice, Comparator.reverseOrder()).thenComparing(Flower::getWaterConsumptionPerDay))
+                                                        .orElse(new Flower()));
+                                    else return
                                                 Map.entry(
                                                         person,
                                                         flowers.stream()
                                                                 .filter(f -> f.getPrice() < 300 && f.getPrice() >= 40 && f.getWaterConsumptionPerDay() > 1)
                                                                 .max(Comparator.comparing(Flower::getWaterConsumptionPerDay))
-                                                                .orElse(new Flower())))
-                                        .toList());
-                })
+                                                                .orElse(new Flower()));
+                                })
+                                .toList()))
                 .peek(entry -> System.out.printf("%s = %s%n", entry.getKey(), entry.getValue()))
                 .map(entry -> entry.getValue().stream().mapToInt(e -> e.getValue().getPrice()).reduce(Integer::sum).orElse(0))
                 .mapToDouble(Double::valueOf)
